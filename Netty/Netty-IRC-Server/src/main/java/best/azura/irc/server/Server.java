@@ -1,19 +1,21 @@
 package best.azura.irc.server;
 
-import best.azura.irc.server.handler.NettyHandler;
+import best.azura.irc.server.handler.AuthenticationHandler;
 import best.azura.irc.utils.SSLUtil;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.string.LineEncoder;
+import io.netty.handler.codec.string.LineSeparator;
 import io.netty.handler.ssl.SslHandler;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -44,7 +46,9 @@ public class Server {
                         protected void initChannel(SocketChannel socketChannel) {
                             socketChannel.pipeline()
                                     .addLast("ssl", sslHandler)
-                                    .addLast(new NettyHandler());
+                                    .addLast("frameDecoder", new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()))
+                                    .addLast("lineEncoder", new LineEncoder(LineSeparator.WINDOWS, StandardCharsets.UTF_8))
+                                    .addLast("authHandler", new AuthenticationHandler());
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
