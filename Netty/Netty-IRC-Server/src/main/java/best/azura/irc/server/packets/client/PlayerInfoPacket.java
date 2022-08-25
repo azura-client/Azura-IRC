@@ -10,7 +10,7 @@ public class PlayerInfoPacket implements IPacket {
     JsonObject data;
 
     @Override
-    public void read(String data) {
+    public void read(Object data) {
 
     }
 
