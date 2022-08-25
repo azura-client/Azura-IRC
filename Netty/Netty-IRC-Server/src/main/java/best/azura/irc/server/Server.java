@@ -23,18 +23,16 @@ import java.security.cert.CertificateException;
 public class Server {
 
     private final int port;
-
-    private final SSLContext sslContext;
     private final SslHandler sslHandler;
 
     public Server(int port) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, KeyManagementException {
         this.port = port;
-        sslContext = SSLUtil.createSSLContext("", "");
+        SSLContext sslContext = SSLUtil.createSSLContext("", "");
         sslHandler = new SslHandler(sslContext.createSSLEngine());
     }
 
     public void start() throws Exception {
-        EventLoopGroup bossGroup = new NioEventLoopGroup(); // (1)
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
