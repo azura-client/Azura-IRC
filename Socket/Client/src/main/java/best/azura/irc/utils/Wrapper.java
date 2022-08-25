@@ -13,7 +13,7 @@ public class Wrapper {
      * @return the Prefix Code.
      */
     public static String getPrefixCode() {
-        return "ง";
+        return "ยง";
     }
 
     /**
