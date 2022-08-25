@@ -1,0 +1,26 @@
+package best.azura.irc.utils;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.util.Base64;
+
+public class SSLUtil {
+
+    public static SSLContext createSSLContext(String certificateBase64, String keystorePassword) throws NoSuchAlgorithmException,
+            KeyStoreException, CertificateException, IOException, UnrecoverableKeyException, KeyManagementException {
+        SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+
+        keyStore.load(new ByteArrayInputStream(Base64.getDecoder().decode(certificateBase64)), keystorePassword.toCharArray());
+
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(sslContext.getProtocol());
+
+        keyManagerFactory.init(keyStore, keystorePassword.toCharArray());
+        sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
+        return sslContext;
+    }
+}
