@@ -27,9 +27,9 @@ public class Server {
     private final int port;
     private final SslHandler sslHandler;
 
-    public Server(int port) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, KeyManagementException {
+    public Server(int port, String base64Cert, String keystorePassword) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, KeyManagementException {
         this.port = port;
-        SSLContext sslContext = SSLUtil.createSSLContext("", "");
+        SSLContext sslContext = SSLUtil.createSSLContext(base64Cert, keystorePassword);
         sslHandler = new SslHandler(sslContext.createSSLEngine());
     }
 

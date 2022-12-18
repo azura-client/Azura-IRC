@@ -1,24 +1,28 @@
 package best.azura.irc.main;
 
 import best.azura.irc.server.Server;
-import best.azura.irc.sql.SQLConnector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import best.azura.irc.utils.Config;
+import best.azura.irc.utils.VersionUtil;
+import io.sentry.Sentry;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Main {
 
     private static Main instance;
-    private SQLConnector sqlConnector;
     private Server server;
-    private Logger logger;
-    private Logger analyticLogger;
 
     public static void main(String[] args) throws Exception {
         instance = new Main();
-        instance.sqlConnector = new SQLConnector("irc", "irc", "password", "localhost", 3306);
-        instance.logger = LoggerFactory.getLogger(Main.class);
-        instance.analyticLogger = LoggerFactory.getLogger("analytic");
-        instance.server = new Server(6969);
+        Config.load();
+
+        Sentry.init(options -> {
+            options.setDsn(Config.getConfiguration().getString("sentry.dsn"));
+            options.setRelease(VersionUtil.getVersion());
+        });
+
+        instance.server = new Server(6969, Files.readString(Path.of("config/cert.txt")), Config.getString("keystore.password"));
         instance.server.start();
     }
 
@@ -28,17 +32,5 @@ public class Main {
 
     public Server getServer() {
         return server;
-    }
-
-    public Logger getLogger() {
-        return logger;
-    }
-
-    public Logger getAnalyticsLogger() {
-        return analyticLogger;
-    }
-
-    public SQLConnector getSQLConnector() {
-        return sqlConnector;
     }
 }
