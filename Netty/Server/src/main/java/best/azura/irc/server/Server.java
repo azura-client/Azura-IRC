@@ -12,6 +12,7 @@ import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.LineEncoder;
 import io.netty.handler.codec.string.LineSeparator;
 import io.netty.handler.ssl.SslHandler;
+import io.sentry.Sentry;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -26,6 +27,10 @@ public class Server {
 
     private final int port;
     private final SslHandler sslHandler;
+    private ChannelFuture channelFuture;
+
+    private final EventLoopGroup bossGroup = new NioEventLoopGroup(4);
+    private final EventLoopGroup workerGroup = new NioEventLoopGroup(4);
 
     public Server(int port, String base64Cert, String keystorePassword) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, KeyManagementException {
         this.port = port;
@@ -54,12 +59,20 @@ public class Server {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
+            channelFuture = serverBootstrap.bind(port).sync();
 
+        } catch (Exception ignore) {
+            Sentry.captureException(ignore);
+        }
+    }
+
+    public void terminate() {
+        try {
             channelFuture.channel().closeFuture().sync();
-        } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
+        } catch (Exception ignore) {
+            Sentry.captureException(ignore);
         }
     }
 }

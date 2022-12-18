@@ -24,6 +24,8 @@ public class Main {
 
         instance.server = new Server(6969, Files.readString(Path.of("config/cert.txt")), Config.getString("keystore.password"));
         instance.server.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> instance.server.terminate()));
     }
 
     public static Main getInstance() {
