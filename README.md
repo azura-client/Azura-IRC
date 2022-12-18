@@ -19,6 +19,7 @@ After the user adds credentials, you only have to set them with
 
 ### Netty
 This rewrite is not yet finished, so please don't use it yet.
+The Netty rewrite is based on [netty-chat](https://github.com/marcosQuesada/netty-chat).
 
 ## Note
 Please note that you have to add your own Auth-System with an integrated Permission-System to actually and safely use the IRC.
