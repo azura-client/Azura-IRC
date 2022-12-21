@@ -27,10 +27,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         try{
             controller.accept(InMemoryRepository.buildSession(ctx, uuid, username, Rank.fromId(rank)));
-            ctx.writeAndFlush(String.format("Welcome %s", uuid));
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Unexpected exception", e.getMessage());
-            ctx.writeAndFlush(e.getMessage());
             ctx.close();
         }
     }

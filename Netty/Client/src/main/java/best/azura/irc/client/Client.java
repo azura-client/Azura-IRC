@@ -1,5 +1,6 @@
 package best.azura.irc.client;
 
+import best.azura.irc.client.handler.ClientHandler;
 import best.azura.irc.client.handler.PacketDecoder;
 import best.azura.irc.client.handler.PacketEncoder;
 import best.azura.irc.client.packets.base.IPacket;
@@ -47,7 +48,8 @@ public class Client {
                                     .addLast("stringDecoder", new PacketDecoder())
                                     .addLast("stringEncoder", new PacketEncoder())
                                     .addLast("lineEncoder", new LineEncoder(LineSeparator.WINDOWS, StandardCharsets.UTF_8))
-                                    .addLast("ssl", SSLUtil.createAllTrustSSLContextClient().newHandler(socketChannel.alloc(), host, port));
+                                    .addLast("ssl", SSLUtil.createAllTrustSSLContextClient().newHandler(socketChannel.alloc(), host, port))
+                                    .addLast("handler", new ClientHandler());
                         }
                     })
                     .option(ChannelOption.SO_KEEPALIVE, true)
