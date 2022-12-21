@@ -20,5 +20,5 @@ This rewrite is not yet finished, so please don't use it yet.<br/>
 The Netty rewrite is based on [netty-chat](https://github.com/marcosQuesada/netty-chat).
 
 ## Note
-Please note that you have to add your own Auth-System with an integrated Permission-System to actually and safely use the IRC.
+Please note that you have to add your own Auth-System with an integrated Permission-System to actually and safely use the IRC.<br/>
 And please credit us if you use this code in any way.
