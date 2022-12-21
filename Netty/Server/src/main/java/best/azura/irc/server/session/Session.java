@@ -22,7 +22,7 @@ public class Session {
     private volatile Rank rank;
 
     public void send(IPacket packet) {
-        ctx.writeAndFlush(PacketUtil.toJSON(packet));
+        ctx.writeAndFlush(packet);
     }
 
     public void terminate() {

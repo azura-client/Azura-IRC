@@ -2,7 +2,8 @@ package best.azura.irc.server;
 
 import best.azura.irc.server.chat.InMemoryChat;
 import best.azura.irc.server.handler.AuthenticationHandler;
-import best.azura.irc.server.handler.PacketHandler;
+import best.azura.irc.server.handler.PacketDecoder;
+import best.azura.irc.server.handler.PacketEncoder;
 import best.azura.irc.server.session.InMemoryRepository;
 import best.azura.irc.utils.SSLUtil;
 import best.azura.irc.utils.executor.Scheduler;
@@ -59,7 +60,8 @@ public class Server {
                             socketChannel.pipeline()
                                     .addLast("ssl", sslHandler)
                                     .addLast("frameDecoder", new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()))
-                                    .addLast("stringDecoder", new PacketHandler())
+                                    .addLast("stringDecoder", new PacketDecoder())
+                                    .addLast("stringEncoder", new PacketEncoder())
                                     .addLast("lineEncoder", new LineEncoder(LineSeparator.WINDOWS, StandardCharsets.UTF_8))
                                     .addLast("authHandler", new AuthenticationHandler(controller,false));
                         }
