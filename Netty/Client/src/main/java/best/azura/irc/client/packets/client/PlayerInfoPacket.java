@@ -1,10 +1,8 @@
-package best.azura.irc.server.packets.client;
+package best.azura.irc.client.packets.client;
 
-import best.azura.irc.server.packets.base.IPacket;
-import best.azura.irc.server.packets.base.PacketInfo;
-import best.azura.irc.server.packets.base.PacketTyp;
-import best.azura.irc.server.session.Session;
-import com.google.gson.JsonObject;
+import best.azura.irc.client.packets.base.IPacket;
+import best.azura.irc.client.packets.base.PacketInfo;
+import best.azura.irc.client.packets.base.PacketTyp;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +17,6 @@ public class PlayerInfoPacket implements IPacket {
     private String[] activeModules;
 
     @Override
-    public void process(Session session) {
+    public void process() {
     }
 }
