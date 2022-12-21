@@ -43,7 +43,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         try {
-            controller.receiveMessage(uuid);
+            controller.receiveMessage(uuid, msg);
         } finally {
             ReferenceCountUtil.release(msg);
         }

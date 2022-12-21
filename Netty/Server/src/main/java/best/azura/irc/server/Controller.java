@@ -1,6 +1,7 @@
 package best.azura.irc.server;
 
 import best.azura.irc.server.chat.IChat;
+import best.azura.irc.server.packets.base.IPacket;
 import best.azura.irc.server.session.ISessionRepository;
 import best.azura.irc.server.session.Session;
 import best.azura.irc.utils.executor.Executor;
@@ -36,7 +37,7 @@ public class Controller {
         sessions.remove(userUUID);
     }
 
-    public void receiveMessage(UUID userUUID) {
+    public void receiveMessage(UUID userUUID, Object message) {
         Session session = sessions.get(userUUID);
         if (session == null) {
             log.error("Session not found on userName %s", userUUID);
@@ -44,5 +45,9 @@ public class Controller {
         }
 
         log.info("Received message from user %s", userUUID);
+
+        if (message instanceof IPacket packet) {
+            packet.process(session);
+        }
     }
 }
