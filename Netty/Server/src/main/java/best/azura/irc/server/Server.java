@@ -1,7 +1,11 @@
 package best.azura.irc.server;
 
+import best.azura.irc.server.chat.InMemoryChat;
 import best.azura.irc.server.handler.AuthenticationHandler;
+import best.azura.irc.server.handler.PacketHandler;
+import best.azura.irc.server.session.InMemoryRepository;
 import best.azura.irc.utils.SSLUtil;
+import best.azura.irc.utils.executor.Scheduler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -32,10 +36,13 @@ public class Server {
     private final EventLoopGroup bossGroup = new NioEventLoopGroup(4);
     private final EventLoopGroup workerGroup = new NioEventLoopGroup(4);
 
+    private Controller controller;
+
     public Server(int port, String base64Cert, String keystorePassword) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, KeyManagementException {
         this.port = port;
         SSLContext sslContext = SSLUtil.createSSLContext(base64Cert, keystorePassword);
         sslHandler = new SslHandler(sslContext.createSSLEngine());
+        controller = new Controller(new InMemoryChat(20), new Scheduler("serverExecutor", 4), new InMemoryRepository());
     }
 
     public void start() throws Exception {
@@ -52,8 +59,9 @@ public class Server {
                             socketChannel.pipeline()
                                     .addLast("ssl", sslHandler)
                                     .addLast("frameDecoder", new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()))
+                                    .addLast("stringDecoder", new PacketHandler())
                                     .addLast("lineEncoder", new LineEncoder(LineSeparator.WINDOWS, StandardCharsets.UTF_8))
-                                    .addLast("authHandler", new AuthenticationHandler());
+                                    .addLast("authHandler", new AuthenticationHandler(controller,false));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)

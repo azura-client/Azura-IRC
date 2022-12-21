@@ -1,6 +1,7 @@
 package best.azura.irc.server.session;
 
 import best.azura.irc.server.packets.base.IPacket;
+import best.azura.irc.utils.PacketUtil;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ public class Session {
     private volatile Rank rank;
 
     public void send(IPacket packet) {
-        ctx.writeAndFlush(packet);
+        ctx.writeAndFlush(PacketUtil.toJSON(packet));
     }
 
     public void terminate() {

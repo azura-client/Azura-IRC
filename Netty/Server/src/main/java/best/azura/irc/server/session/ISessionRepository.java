@@ -2,7 +2,7 @@ package best.azura.irc.server.session;
 
 import java.util.UUID;
 
-public interface SessionRepository {
+public interface ISessionRepository {
 
     void add(Session session);
 

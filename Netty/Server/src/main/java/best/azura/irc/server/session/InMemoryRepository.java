@@ -3,13 +3,12 @@ package best.azura.irc.server.session;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.NoArgsConstructor;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @NoArgsConstructor
-public class InMemoryRepository implements SessionRepository {
+public class InMemoryRepository implements ISessionRepository {
     private Map<UUID, Session> sessions = new ConcurrentHashMap<>();
 
     public Session get(UUID uuid) {

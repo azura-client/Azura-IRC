@@ -1,5 +1,8 @@
 package best.azura.irc.server.packets.base;
+
+import best.azura.irc.server.session.Session;
+
 public interface IPacket {
 
-    void read(Object data);
+    void process(Session session);
 }
