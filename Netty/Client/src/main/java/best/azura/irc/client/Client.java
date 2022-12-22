@@ -4,6 +4,7 @@ import best.azura.irc.client.handler.ClientHandler;
 import best.azura.irc.client.handler.PacketDecoder;
 import best.azura.irc.client.handler.PacketEncoder;
 import best.azura.irc.client.packets.base.IPacket;
+import best.azura.irc.client.packets.client.UserAuthenticationPacket;
 import best.azura.irc.utils.SSLUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -14,9 +15,11 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.LineEncoder;
 import io.netty.handler.codec.string.LineSeparator;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 public class Client {
 
     private String host;
@@ -52,11 +55,11 @@ public class Client {
                                     .addLast("handler", new ClientHandler());
                         }
                     })
-                    .option(ChannelOption.SO_KEEPALIVE, true)
-                    .option(ChannelOption.SO_BACKLOG, 128);
+                    .option(ChannelOption.SO_KEEPALIVE, true);
 
             channel = bootstrap.connect(host, port).sync().channel();
-
+            log.info("Connected");
+            send(new UserAuthenticationPacket("baller", "bals", "SEXS", 2));
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -4,19 +4,32 @@ import lombok.extern.slf4j.Slf4j;
 import org.simpleyaml.configuration.file.YamlFile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 
 @Slf4j
 public class Config {
 
-    private static YamlFile yamlConfiguration;
+    private YamlFile yamlConfiguration;
 
-    public static void load() {
+    public Config() {
+        load();
+    }
+
+    public void load() {
         try {
             Path storage = Path.of("config");
+            Path cert = Path.of("config/irc.keystore");
+
             if (!Files.exists(storage))
                 Files.createDirectory(storage);
+
+            if (!Files.exists(cert))
+                Files.writeString(cert, "");
+
         } catch (Exception exception) {
             log.error("Could not create Config folder!", exception);
         }
@@ -35,31 +48,49 @@ public class Config {
 
             yamlConfiguration.addDefault("server.port", 6969);
             yamlConfiguration.addDefault("sentry.dsn", "https://sentry.io/");
+            yamlConfiguration.addDefault("keystore.password", "password");
+
+            try {
+                yamlConfiguration.save(getFile());
+            } catch (IOException e) {
+                log.error("Could not save config.yml!", e);
+            }
         }
     }
 
-    public static String getString(String path) {
+    public String getKeystore() {
+        try (FileInputStream fileInputStream = new FileInputStream("config/irc.keystore")) {
+            byte[] bytes = fileInputStream.readAllBytes();
+            return Base64.getEncoder().encodeToString(bytes);
+        } catch (IOException e) {
+            log.error("Could not read keystore!", e);
+        }
+
+        return null;
+    }
+
+    public String getString(String path) {
         return getConfiguration().getString(path);
     }
 
-    public static YamlFile createConfiguration() {
+    public YamlFile createConfiguration() {
         try {
-            return new YamlFile(getFile());
+            return YamlFile.loadConfiguration(getFile());
         } catch (Exception ignore) {
             log.error("Failed to load config.yml", ignore);
             return new YamlFile();
         }
     }
 
-    public static YamlFile getConfiguration() {
+    public YamlFile getConfiguration() {
         if (yamlConfiguration == null) {
-            yamlConfiguration = createConfiguration();
+            return yamlConfiguration = createConfiguration();
         }
 
         return yamlConfiguration;
     }
 
-    public static File getFile() {
+    public File getFile() {
         return new File("config/config.yml");
     }
 

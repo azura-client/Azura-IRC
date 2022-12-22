@@ -18,8 +18,10 @@ import io.netty.handler.codec.string.LineEncoder;
 import io.netty.handler.codec.string.LineSeparator;
 import io.netty.handler.ssl.SslHandler;
 import io.sentry.Sentry;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
@@ -28,10 +30,12 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
+@Slf4j
 public class Server {
 
     private final int port;
-    private final SslHandler sslHandler;
+    private final SSLContext sslContext;
+    private final SSLEngine sslEngine;
     private ChannelFuture channelFuture;
 
     private final EventLoopGroup bossGroup = new NioEventLoopGroup(4);
@@ -41,8 +45,8 @@ public class Server {
 
     public Server(int port, String base64Cert, String keystorePassword) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, KeyManagementException {
         this.port = port;
-        SSLContext sslContext = SSLUtil.createSSLContext(base64Cert, keystorePassword);
-        sslHandler = new SslHandler(sslContext.createSSLEngine());
+        sslContext = SSLUtil.createSSLContext(base64Cert, keystorePassword);
+        sslEngine = sslContext.createSSLEngine();
         controller = new Controller(new InMemoryChat(20), new Scheduler("serverExecutor", 4), new InMemoryRepository());
     }
 
@@ -55,7 +59,7 @@ public class Server {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
                             socketChannel.pipeline()
-                                    .addLast("ssl", sslHandler)
+                                    .addLast("ssl", new SslHandler(sslEngine))
                                     .addLast("frameDecoder", new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()))
                                     .addLast("stringDecoder", new PacketDecoder())
                                     .addLast("stringEncoder", new PacketEncoder())
@@ -67,7 +71,7 @@ public class Server {
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
             channelFuture = serverBootstrap.bind(port).sync();
-
+            log.info("Server started on port " + port);
         } catch (Exception ignore) {
             Sentry.captureException(ignore);
         }
