@@ -10,15 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
-public class PacketEncoder extends MessageToByteEncoder {
+public class PacketEncoder extends MessageToByteEncoder<IPacket> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
-        if (msg instanceof IPacket) {
-            IPacket packet = (IPacket) msg;
-            out.writeBytes(PacketUtil.toJSON(packet).getBytes(StandardCharsets.UTF_8));
-        } else {
-            log.error("Invalid message going out!");
-        }
+    protected void encode(ChannelHandlerContext ctx, IPacket msg, ByteBuf out) throws Exception {
+        out.writeBytes(PacketUtil.toJSON(msg).getBytes(StandardCharsets.UTF_8));
+        log.info("Sent packet: " + msg);
     }
 }

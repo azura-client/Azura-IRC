@@ -3,13 +3,18 @@ package best.azura.irc.main;
 import best.azura.irc.server.Server;
 import best.azura.irc.utils.Config;
 import best.azura.irc.utils.VersionUtil;
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import io.sentry.Sentry;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.Security;
 import java.util.Set;
+
+import static java.lang.System.exit;
 
 @Slf4j
 public class Main {
@@ -28,10 +33,26 @@ public class Main {
             options.setRelease(VersionUtil.getVersion());
         });*/
 
-        instance.server = new Server(6969, config.getKeystore(), config.getString("keystore.password"));
+        InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
+
+        instance.server = new Server(config.getInt("server.port"), config.getKeystore(), config.getString("keystore.password"));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> instance.server.terminate()));
+
         instance.server.start();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> instance.server.terminate()));
+        waitUntilKeypressed();
+        exit(0);
+    }
+
+    private static void waitUntilKeypressed() {
+        try {
+            System.in.read();
+            while (System.in.available() > 0) {
+                System.in.read();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static Main getInstance() {

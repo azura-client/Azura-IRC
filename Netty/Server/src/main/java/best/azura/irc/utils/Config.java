@@ -73,6 +73,10 @@ public class Config {
         return getConfiguration().getString(path);
     }
 
+    public int getInt(String path) {
+        return getConfiguration().getInt(path);
+    }
+
     public YamlFile createConfiguration() {
         try {
             return YamlFile.loadConfiguration(getFile());

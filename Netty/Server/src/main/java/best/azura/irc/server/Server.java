@@ -35,7 +35,7 @@ public class Server {
 
     private final int port;
     private final SSLContext sslContext;
-    private final SSLEngine sslEngine;
+    private volatile SSLEngine sslEngine;
     private ChannelFuture channelFuture;
 
     private final EventLoopGroup bossGroup = new NioEventLoopGroup(4);
@@ -43,10 +43,11 @@ public class Server {
 
     private Controller controller;
 
-    public Server(int port, String base64Cert, String keystorePassword) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, KeyManagementException {
+    public Server(int port, String base64Keystore, String keystorePassword) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, KeyManagementException {
         this.port = port;
-        sslContext = SSLUtil.createSSLContext(base64Cert, keystorePassword);
+        sslContext = SSLUtil.createSSLContext(base64Keystore, keystorePassword);
         sslEngine = sslContext.createSSLEngine();
+        sslEngine.setUseClientMode(false);
         controller = new Controller(new InMemoryChat(20), new Scheduler("serverExecutor", 4), new InMemoryRepository());
     }
 
@@ -59,7 +60,7 @@ public class Server {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
                             socketChannel.pipeline()
-                                    .addLast("ssl", new SslHandler(sslEngine))
+                                    ////.addLast("ssl", new SslHandler(sslEngine))
                                     .addLast("frameDecoder", new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()))
                                     .addLast("stringDecoder", new PacketDecoder())
                                     .addLast("stringEncoder", new PacketEncoder())

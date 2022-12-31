@@ -5,6 +5,10 @@ import best.azura.irc.server.packets.base.IPacket;
 import best.azura.irc.server.session.ISessionRepository;
 import best.azura.irc.server.session.Session;
 import best.azura.irc.utils.executor.Executor;
+import io.netty.channel.Channel;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.util.concurrent.ImmediateEventExecutor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
@@ -16,10 +20,17 @@ public class Controller {
     private ISessionRepository sessions;
     private Executor executor;
 
+    private volatile ChannelGroup channels = new DefaultChannelGroup(ImmediateEventExecutor.INSTANCE);
+
     public Controller(IChat broker, Executor executor, ISessionRepository sessions) {
         this.broker = broker;
         this.executor = executor;
         this.sessions = sessions;
+    }
+
+    public void addChannel(Channel channel) {
+        channels.add(channel);
+        log.info("Channel added: " + channel.id());
     }
 
     public void accept(Session session) {
