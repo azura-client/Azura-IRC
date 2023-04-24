@@ -51,11 +51,11 @@ public class Controller {
     public void receiveMessage(UUID userUUID, Object message) {
         Session session = sessions.get(userUUID);
         if (session == null) {
-            log.error("Session not found on userName %s", userUUID);
+            log.error("Session not found on userName %s".formatted(userUUID));
             return;
         }
 
-        log.info("Received message from user %s", userUUID);
+        log.info("Received message from user %s".formatted(userUUID));
 
         if (message instanceof IPacket packet) {
             packet.process(session);

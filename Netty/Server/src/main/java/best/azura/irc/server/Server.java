@@ -8,22 +8,23 @@ import best.azura.irc.server.session.InMemoryRepository;
 import best.azura.irc.utils.SSLUtil;
 import best.azura.irc.utils.executor.Scheduler;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.Delimiters;
-import io.netty.handler.codec.string.LineEncoder;
-import io.netty.handler.codec.string.LineSeparator;
-import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import io.sentry.Sentry;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -61,10 +62,10 @@ public class Server {
                         protected void initChannel(SocketChannel socketChannel) {
                             socketChannel.pipeline()
                                     ////.addLast("ssl", new SslHandler(sslEngine))
-                                    .addLast("frameDecoder", new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()))
+                                    .addLast("frameDecoder", new LengthFieldBasedFrameDecoder(5120, 0, 4, 0, 4))
+                                    .addLast( "frameEncoder", new LengthFieldPrepender(4, false))
                                     .addLast("stringDecoder", new PacketDecoder())
                                     .addLast("stringEncoder", new PacketEncoder())
-                                    .addLast("lineEncoder", new LineEncoder(LineSeparator.WINDOWS, StandardCharsets.UTF_8))
                                     .addLast("authHandler", new AuthenticationHandler(controller,false));
                         }
                     })

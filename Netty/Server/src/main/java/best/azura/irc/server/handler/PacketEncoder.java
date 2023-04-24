@@ -14,7 +14,11 @@ public class PacketEncoder extends MessageToByteEncoder<IPacket> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, IPacket msg, ByteBuf out) {
-        out.writeBytes(PacketUtil.toJSON(msg).getBytes(StandardCharsets.UTF_8));
-        log.info("Sent packet: " + msg);
+        try {
+            out.writeBytes(PacketUtil.toJSON(msg).getBytes(StandardCharsets.UTF_8));
+            log.info("Sent packet: " + msg);
+        } catch (Exception exception) {
+            log.error("Failed to sent packet!", exception);
+        }
     }
 }

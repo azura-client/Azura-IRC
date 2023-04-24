@@ -16,7 +16,8 @@ After the user adds credentials, you only have to set them with<br/>
 ``Wrapper.getIRCConnector().username = inputName;`` and ``Wrapper.getIRCConnector().password = inputPassword;``, if you have done all of this, you should be ready to go!
 
 ## [Netty](https://github.com/azura-client/Azura-IRC/tree/main/Netty)
-This rewrite is not yet finished, so please don't use it yet.<br/>
+This rewrite has reached its alpha builds on the date of 24.04.2023.<br/>
+Be aware Instability and crashes can happen often in this state, please wait till we release a finalized release<br/>
 The Netty rewrite is based on [netty-chat](https://github.com/marcosQuesada/netty-chat).
 
 ## Note

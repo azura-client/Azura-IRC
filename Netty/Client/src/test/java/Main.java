@@ -20,8 +20,8 @@ public class Main {
 
     public static void main(String[] args) throws IOException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
-        byte[] keystoreFile = Files.readAllBytes(new File("config", "irc.keystore").toPath());
-        client = new Client("localhost", 6968, Base64.encodeBase64String(keystoreFile), args[0]);
+        byte[] keystoreFile = Files.readAllBytes(new File("config", "keystore.jks").toPath());
+        client = new Client("localhost", 6969, Base64.encodeBase64String(keystoreFile), args[0]);
         client.connect();
     }
 

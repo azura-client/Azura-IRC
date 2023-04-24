@@ -49,6 +49,7 @@ public class Config {
             yamlConfiguration.addDefault("server.port", 6969);
             yamlConfiguration.addDefault("sentry.dsn", "https://sentry.io/");
             yamlConfiguration.addDefault("keystore.password", "password");
+            yamlConfiguration.addDefault("keystore.location", "config/irc.keystore");
 
             try {
                 yamlConfiguration.save(getFile());
@@ -59,7 +60,7 @@ public class Config {
     }
 
     public String getKeystore() {
-        try (FileInputStream fileInputStream = new FileInputStream("config/irc.keystore")) {
+        try (FileInputStream fileInputStream = new FileInputStream(yamlConfiguration.getString("keystore.location", "config/irc.keystore"))) {
             byte[] bytes = fileInputStream.readAllBytes();
             return Base64.getEncoder().encodeToString(bytes);
         } catch (IOException e) {

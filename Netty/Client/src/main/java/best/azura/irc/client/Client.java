@@ -4,24 +4,19 @@ import best.azura.irc.client.handler.ClientHandler;
 import best.azura.irc.client.handler.PacketDecoder;
 import best.azura.irc.client.handler.PacketEncoder;
 import best.azura.irc.client.packets.base.IPacket;
-import best.azura.irc.client.packets.client.UserAuthenticationPacket;
 import best.azura.irc.utils.SSLUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.Delimiters;
-import io.netty.handler.codec.string.LineEncoder;
-import io.netty.handler.codec.string.LineSeparator;
-import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -64,10 +59,10 @@ public class Client {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             socketChannel.pipeline()
                                     ////.addLast("ssl", new SslHandler(sslEngine))
-                                    .addLast("frameDecoder", new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()))
+                                    .addLast("frameDecoder", new LengthFieldBasedFrameDecoder(5120, 0, 4, 0, 4))
+                                    .addLast( "frameEncoder", new LengthFieldPrepender(4, false))
                                     .addLast("stringDecoder", new PacketDecoder())
                                     .addLast("stringEncoder", new PacketEncoder())
-                                    .addLast("lineEncoder", new LineEncoder(LineSeparator.WINDOWS, StandardCharsets.UTF_8))
                                     .addLast("handler", new ClientHandler());
                         }
                     })
