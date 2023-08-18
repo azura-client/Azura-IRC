@@ -25,7 +25,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         try {
             log.info("Got Channel Id " + channelFuture.sync().channel().id());
         } catch (Exception exception) {
-            exception.printStackTrace();
+            log.error("Channel activation failed.", exception);
         }
     }
 
@@ -40,9 +40,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.error("Exception caught ", cause.getMessage());
-        cause.printStackTrace();
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        log.error("Exception caught!", cause);
         ctx.close();
     }
 }

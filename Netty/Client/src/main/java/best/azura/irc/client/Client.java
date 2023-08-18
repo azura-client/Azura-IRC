@@ -73,7 +73,7 @@ public class Client {
                 log.info("Connected");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error when connecting: ", e);
         }
     }
 
@@ -87,7 +87,7 @@ public class Client {
         try {
             log.info("Got Channel Id " + channelFuture.sync().channel().id());
         } catch (Exception exception) {
-            exception.printStackTrace();
+            log.error("Error when sending: ", exception);
         }
     }
 }

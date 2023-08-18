@@ -6,6 +6,7 @@ import best.azura.irc.utils.VersionUtil;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import io.sentry.Sentry;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -17,11 +18,11 @@ import java.util.Set;
 import static java.lang.System.exit;
 
 @Slf4j
+@Getter
 public class Main {
 
     private static Main instance;
     private Server server;
-
     private static Config config;
 
     public static void main(String[] args) throws Exception {
@@ -33,7 +34,7 @@ public class Main {
             options.setRelease(VersionUtil.getVersion());
         });*/
 
-        InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
+        InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.getDefaultFactory());
 
         instance.server = new Server(config.getInt("server.port"), config.getKeystore(), config.getString("keystore.password"));
         Runtime.getRuntime().addShutdownHook(new Thread(() -> instance.server.terminate()));
@@ -51,15 +52,7 @@ public class Main {
                 System.in.read();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to wait until keypress!", e);
         }
-    }
-
-    public static Main getInstance() {
-        return instance;
-    }
-
-    public Server getServer() {
-        return server;
     }
 }
